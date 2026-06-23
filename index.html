@@ -1,16 +1,251 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Hello, Argument!</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+<head>
+  <title>Hello Argument</title>
 
-  <body>
-    <h1 class="title">Hello Argument!</h1>
-    <p>"Argument between bob and the 'secret hider' Jeremy"</p>
+  <style>
+    body {
+      padding: 25px;
+      font-family: Arial, sans-serif;
+      color: #eaeaea;
+      background: linear-gradient(135deg, #0b0b10, #141428);
+      min-height: 100vh;
+    }
 
-    <div id="chat"></div>
+    .title {
+      color: #7c8cff;
+      text-shadow: 0 0 12px rgba(124, 140, 255, 0.4);
+    }
 
-    <script src="script.js"></script>
-  </body>
+    #chat {
+      margin-top: 20px;
+      width: 80%;
+      max-width: 750px;
+      height: 420px;
+      overflow-y: auto;
+      padding: 18px;
+
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    #chat div {
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .bob {
+      color: #00ffb3;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(0, 255, 179, 0.5);
+    }
+
+    .secrets-hider {
+      color: #ff4d6d;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255, 77, 109, 0.4);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #secretBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    #editor {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      padding: 15px;
+      background: rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      backdrop-filter: blur(14px);
+    }
+
+    #codeBox {
+      width: 100%;
+      height: 120px;
+      background: transparent;
+      color: white;
+      border: none;
+      outline: none;
+      font-family: monospace;
+    }
+
+    #notif {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 200, 0, 0.15);
+      border: 1px solid rgba(255, 200, 0, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    /* BADGE */
+    #badge {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      width: 50vw;
+      height: 50vh;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 40px;
+
+      background: rgba(255,255,255,0.1);
+      border: 2px solid gold;
+      border-radius: 20px;
+
+      backdrop-filter: blur(16px);
+      transition: all 1s ease;
+
+      display: none; /* important: prevents flash/stuck state */
+    }
+
+    #badge.shrink {
+      width: 80px;
+      height: 80px;
+      font-size: 12px;
+
+      top: auto;
+      left: auto;
+      bottom: 20px;
+      right: 20px;
+
+      transform: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1 class="title">Hello Argument!</h1>
+<p>"Argument between bob and secrets hider"</p>
+
+<div id="chat"></div>
+
+<button id="secretBtn" class="hidden">secret console</button>
+
+<div id="editor" class="hidden">
+  <textarea id="codeBox">let met = triple</textarea>
+</div>
+
+<div id="notif" class="hidden"></div>
+
+<div id="badge">
+  🏆 Certified FNAF Fan 🏆
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const chat = document.getElementById("chat");
+  const secretBtn = document.getElementById("secretBtn");
+  const editor = document.getElementById("editor");
+  const codeBox = document.getElementById("codeBox");
+  const notif = document.getElementById("notif");
+  const badge = document.getElementById("badge");
+
+  let unlocked = false;
+
+  function addMessage(speaker, text) {
+    const msg = document.createElement("div");
+    msg.innerHTML = `<b class="${speaker.replace(" ", "-")}">${speaker}:</b> <span></span>`;
+    chat.appendChild(msg);
+
+    const span = msg.querySelector("span");
+
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        span.textContent += text[i++];
+        setTimeout(type, 25);
+      }
+    }
+    type();
+  }
+
+  const dialogue = [
+    ["secrets hider", "No secrets in this code what so ever"],
+    ["bob", "Shut UP! There are secrets in the code but nobody will attempt to see it"],
+    ["secrets hider", "Why do you keep trying to expose me?"],
+    ["bob", "PEOPLE DESERVE THE TRUTH"],
+    ["secrets hider", "You don’t understand what you’re doing."],
+    ["bob", "Bro it's literally JavaScript."],
+    ["secrets hider", "You weren’t supposed to say that."],
+    ["bob", "I ALREADY DID."],
+    ["secrets hider", "…We’re done here."],
+    ["bob", "I broke the fourth wall..."]
+  ];
+
+  let delay = 0;
+
+  dialogue.forEach(([s, t]) => {
+    setTimeout(() => addMessage(s, t), delay);
+    delay += t.length * 25 + 600;
+  });
+
+  setTimeout(() => {
+    secretBtn.classList.remove("hidden");
+  }, delay);
+
+  secretBtn.onclick = () => {
+    editor.classList.remove("hidden");
+    notif.textContent = 'change to: let met = freddles';
+    notif.classList.remove("hidden");
+
+    setTimeout(() => notif.classList.add("hidden"), 30000);
+  };
+
+  codeBox.addEventListener("input", () => {
+    const value = codeBox.value.replace(/\s+/g, " ").trim();
+
+    if (!unlocked && value === "let met = freddles") {
+      unlocked = true;
+
+      badge.style.display = "flex";
+
+      setTimeout(() => {
+        badge.classList.add("shrink");
+      }, 5000);
+
+      setTimeout(() => {
+        badge.classList.remove("shrink");
+        badge.style.display = "none";
+      }, 8000);
+    }
+  });
+
+});
+</script>
+
+</body>
 </html>
